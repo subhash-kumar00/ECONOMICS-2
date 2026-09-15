@@ -12,6 +12,21 @@
     .custom-scroll::-webkit-scrollbar { width: 6px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
   </style>
+
+<script>
+window.addEventListener('error', function(e) {
+  console.error('Exam JavaScript error:', e.error || e.message);
+  const msg = document.getElementById('motivationScreen');
+  if (msg && !document.getElementById('examErrorBox')) {
+    const box = document.createElement('div');
+    box.id = 'examErrorBox';
+    box.className = 'mt-4 p-3 rounded-xl border border-rose-500/40 bg-rose-950/30 text-rose-300 text-xs';
+    box.textContent = 'Exam load ചെയ്യുന്നതിൽ പ്രശ്നമുണ്ട്. Browser Console പരിശോധിക്കുക.';
+    msg.appendChild(box);
+  }
+});
+</script>
+
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between select-none">
 
@@ -224,6 +239,7 @@
     }
 
     function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
       const timerDisplay = document.getElementById('examTimer');
       timerInterval = setInterval(() => {
         if (timeLeft <= 0) {
@@ -424,13 +440,30 @@
     }
 
     function returnToHomeWithData() {
-      const homePortalUrl = "https://subhash-kumar00.github.io/PSC-EXAMS/";
       const score = document.getElementById('finalScore').innerText;
       const correct = document.getElementById('correctCount').innerText;
       const wrong = document.getElementById('wrongCount').innerText;
       const skipped = document.getElementById('skipCount').innerText;
 
-      window.location.href = `${homePortalUrl}?completed=true&title=${encodeURIComponent(examTitle)}&score=${score}&correct=${correct}&wrong=${wrong}&skipped=${skipped}`;
+      try {
+        const historyKey = `sk_history_${currentUser.phone}`;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        history.push({
+          title: examTitle,
+          score,
+          correct,
+          wrong,
+          skipped,
+          date: new Date().toLocaleDateString('ml-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        });
+        localStorage.setItem(historyKey, JSON.stringify(history));
+      } catch (e) {}
+
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('motivationScreen').classList.remove('hidden');
+      document.getElementById('quizScreen').classList.add('hidden');
+      document.getElementById('quizScreen').classList.remove('flex');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   </script>
 </body>
