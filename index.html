@@ -33,32 +33,9 @@
   </header>
 
   <main class="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 w-full max-w-4xl mx-auto">
-    
-    <!-- Step 1: Motivation Card (Start Page) -->
-    <div id="motivationScreen" class="w-full max-w-lg bg-slate-800 border-2 border-emerald-500/60 rounded-3xl p-8 sm:p-10 shadow-2xl text-center space-y-6">
-      <div class="w-20 h-20 bg-gradient-to-tr from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow-xl">
-        🎯
-      </div>
-      <div>
-        <h2 id="motivateName" class="text-2xl sm:text-3xl font-black text-white">ഹലോ! ✨</h2>
-        <p class="text-emerald-400 font-extrabold text-xs sm:text-sm mt-1 uppercase tracking-widest">സാമ്പത്തിക ശാസ്ത്ര പരീക്ഷയിലേക്ക് സ്വാഗതം!</p>
-      </div>
 
-      <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-700 text-slate-200 text-xs sm:text-sm leading-relaxed space-y-2 shadow-inner">
-        <p class="font-bold text-emerald-400 text-sm">"സ്ഥിരതയും കൃത്യമായ പരിശീലനവുമാണ് ഏത് മത്സരപരീക്ഷയിലും നിങ്ങളെ ഒന്നാമതെത്തിക്കുന്നത്."</p>
-        <p class="text-slate-300">നിങ്ങളുടെ ലക്ഷ്യം മനസ്സിലുറപ്പിച്ചു കൊണ്ട് ഓരോ ചോദ്യത്തെയും ആത്മവിശ്വാസത്തോടെ നേരിടുക. Best of luck!</p>
-      </div>
-
-      <div class="pt-2">
-        <button type="button" onclick="startExamNow()" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 text-slate-950 font-black rounded-2xl transition transform active:scale-95 shadow-xl text-base flex items-center justify-center space-x-2 cursor-pointer">
-          <span>പരീക്ഷ ആരംഭിക്കുക</span>
-          <span>🚀</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Step 2: Quiz Question Screen -->
-    <div id="quizScreen" class="w-full hidden flex-col space-y-4">
+    <!-- Quiz Question Screen (നേരിട്ട് ദൃശ്യമാകുന്നു) -->
+    <div id="quizScreen" class="w-full flex flex-col space-y-4">
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-md">
         <div class="flex items-center space-x-2">
           <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 font-bold rounded-lg text-xs sm:text-sm" id="questionBadge">ചോദ്യം 1 / 25</span>
@@ -77,7 +54,7 @@
 
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 sm:p-8 shadow-2xl relative">
         <div class="mb-5">
-          <h2 id="qText" class="font-semibold leading-relaxed text-slate-100 whitespace-pre-line text-base sm:text-lg"></h2>
+          <h2 id="qText" class="font-semibold leading-relaxed text-slate-100 whitespace-pre-line text-base sm:text-lg">ലോഡ് ചെയ്യുന്നു...</h2>
         </div>
 
         <div id="optionsContainer" class="space-y-2.5 mb-6"></div>
@@ -97,7 +74,7 @@
       </div>
     </div>
 
-    <!-- Step 3: Result Screen -->
+    <!-- Result Screen -->
     <div id="resultScreen" class="w-full hidden space-y-6">
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-5">
         <div class="flex justify-end">
@@ -192,6 +169,7 @@
     let timeLeft = 25 * 60;
     let timerInterval = null;
 
+    // 🌟 പേജ് ലോഡ് ആകുമ്പോൾ തന്നെ ചോദ്യങ്ങൾ തനിയെ ലോഡ് ആകുന്നു
     window.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
       const passedName = urlParams.get('name');
@@ -205,18 +183,11 @@
       if (passedSheet) GOOGLE_SHEET_WEBAPP_URL = decodeURIComponent(passedSheet);
 
       document.getElementById('displayUser').innerText = `${currentUser.name} (+91 ${currentUser.phone})`;
-      document.getElementById('motivateName').innerText = `ഹലോ, ${currentUser.name}! ✨`;
-    });
 
-    function startExamNow() {
-      document.getElementById('motivationScreen').classList.add('hidden');
-      const qScreen = document.getElementById('quizScreen');
-      qScreen.classList.remove('hidden');
-      qScreen.classList.add('flex');
       buildPalette();
       renderQuestion(0);
       startTimer();
-    }
+    });
 
     function startTimer() {
       const timerDisplay = document.getElementById('examTimer');
