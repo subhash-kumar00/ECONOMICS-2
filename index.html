@@ -11,22 +11,13 @@
     body { font-family: 'Noto Sans Malayalam', 'Manrope', sans-serif; }
     .custom-scroll::-webkit-scrollbar { width: 6px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    @keyframes popZoom {
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop { animation: popZoom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
   </style>
-
-<script>
-window.addEventListener('error', function(e) {
-  console.error('Exam JavaScript error:', e.error || e.message);
-  const msg = document.getElementById('motivationScreen');
-  if (msg && !document.getElementById('examErrorBox')) {
-    const box = document.createElement('div');
-    box.id = 'examErrorBox';
-    box.className = 'mt-4 p-3 rounded-xl border border-rose-500/40 bg-rose-950/30 text-rose-300 text-xs';
-    box.textContent = 'Exam load ചെയ്യുന്നതിൽ പ്രശ്നമുണ്ട്. Browser Console പരിശോധിക്കുക.';
-    msg.appendChild(box);
-  }
-});
-</script>
-
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between select-none">
 
@@ -42,21 +33,21 @@ window.addEventListener('error', function(e) {
       </div>
     </div>
     <div class="text-right">
-      <span id="displayUser" class="text-xs sm:text-sm font-semibold text-slate-200">NAME</span>
+      <span id="displayUser" class="text-xs sm:text-sm font-semibold text-slate-200">പരീക്ഷാർത്ഥി</span>
       <p class="text-[10px] text-emerald-400 font-mono">+1.00 / -0.33 Mark</p>
     </div>
   </header>
 
   <main class="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 w-full max-w-4xl mx-auto">
     
-    <!-- Step 1: Motivation Card (Start Page) -->
-    <div id="motivationScreen" class="w-full max-w-lg bg-slate-800 border-2 border-emerald-500/60 rounded-3xl p-8 sm:p-10 shadow-2xl text-center space-y-6">
-      <div class="w-20 h-20 bg-gradient-to-tr from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow-xl">
+    <!-- Step 1: Motivation Card (Start Screen) -->
+    <div id="motivationScreen" class="w-full max-w-lg bg-slate-800 border-2 border-emerald-500/60 rounded-3xl p-8 sm:p-10 shadow-2xl text-center space-y-6 animate-pop">
+      <div class="w-20 h-20 bg-gradient-to-tr from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow-xl animate-bounce">
         🎯
       </div>
       <div>
         <h2 id="motivateName" class="text-2xl sm:text-3xl font-black text-white">ഹലോ! ✨</h2>
-        <p class="text-emerald-400 font-extrabold text-xs sm:text-sm mt-1 uppercase tracking-widest">സാമ്പത്തിക ശാസ്ത്ര പരീക്ഷയിലേക്ക് സ്വാഗതം!</p>
+        <p class="text-emerald-400 font-extrabold text-xs sm:text-sm mt-1 uppercase tracking-widest">ലക്ഷ്യത്തിലേക്ക് ഒരു ചുവട് കൂടി മുന്നോട്ട്!</p>
       </div>
 
       <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-700 text-slate-200 text-xs sm:text-sm leading-relaxed space-y-2 shadow-inner">
@@ -85,7 +76,7 @@ window.addEventListener('error', function(e) {
           <span id="examTimer" class="font-mono text-sm font-black text-emerald-400">25:00</span>
         </div>
 
-        <button type="button" onclick="finishExam()" class="px-3 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-semibold rounded-lg transition">
+        <button type="button" onclick="finishExamPrompt()" class="px-3 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-semibold rounded-lg transition">
           ഫിനിഷ് ചെയ്യുക
         </button>
       </div>
@@ -112,52 +103,95 @@ window.addEventListener('error', function(e) {
       </div>
     </div>
 
-    <!-- Step 3: Result Screen -->
+    <!-- Step 3: Result Screen & Interactive Reviews -->
     <div id="resultScreen" class="w-full hidden space-y-6">
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-5">
+        
         <div class="flex justify-end">
-          <button type="button" onclick="returnToHomeWithData()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition shadow">
-            🏠 ഹോം പേജിലേക്ക് മടങ്ങുക (Save Result)
+          <button type="button" onclick="returnToHomeWithData()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition shadow flex items-center space-x-1.5">
+            <span>🏠</span>
+            <span>ഹോം പേജിലേക്ക് മടങ്ങുക (Save Result)</span>
           </button>
         </div>
 
         <div>
           <h2 class="text-2xl sm:text-3xl font-black text-emerald-400 mb-1">പരീക്ഷാ ഫലം (Exam Result)</h2>
           <p class="text-sm text-slate-400 mb-1" id="resultCandidateInfo"></p>
+          <span class="inline-block text-[11px] text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-800">
+            ✓ ഫലം പ്രൊഫൈൽ ഹിസ്റ്ററിയിൽ രേഖപ്പെടുത്തിയിട്ടുണ്ട്
+          </span>
         </div>
 
+        <!-- Dynamic Motivation Badge -->
+        <div id="scoreMotivationBadge" class="max-w-xl mx-auto p-4 rounded-2xl border text-sm leading-relaxed transition shadow-inner"></div>
+
+        <!-- Clickable Score Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
           <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700">
             <span class="text-[11px] text-slate-400 block font-semibold uppercase">നെറ്റ് സ്കോർ</span>
             <span id="finalScore" class="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">0.00</span>
             <span class="text-[10px] text-slate-500 block">25 ൽ</span>
           </div>
-          <div class="bg-slate-900/80 p-3.5 rounded-xl border border-emerald-800/80">
-            <span class="text-[11px] text-emerald-400 block font-semibold uppercase">ശരി (+1)</span>
+
+          <div id="filterCorrectCard" class="bg-slate-900/80 p-3.5 rounded-xl border border-emerald-800/80 hover:bg-emerald-950/40 cursor-pointer transition shadow hover:border-emerald-500 group" title="ശരിയായ ചോദ്യങ്ങൾ കാണാൻ ക്ലിക്ക് ചെയ്യുക">
+            <span class="text-[11px] text-emerald-400 block font-semibold uppercase group-hover:underline">ശരി (+1) 👆</span>
             <span id="correctCount" class="text-xl sm:text-2xl font-bold text-emerald-400 font-mono">0</span>
+            <span class="text-[10px] text-emerald-400/60 block">കാണാൻ ക്ലിക്ക് ചെയ്യുക</span>
           </div>
-          <div class="bg-slate-900/80 p-3.5 rounded-xl border border-rose-800/80">
-            <span class="text-[11px] text-rose-400 block font-semibold uppercase">തെറ്റ് (-0.33)</span>
+
+          <div id="filterWrongCard" class="bg-slate-900/80 p-3.5 rounded-xl border border-rose-800/80 hover:bg-rose-950/40 cursor-pointer transition shadow hover:border-rose-500 group" title="തെറ്റിയ ചോദ്യങ്ങൾ കാണാൻ ക്ലിക്ക് ചെയ്യുക">
+            <span class="text-[11px] text-rose-400 block font-semibold uppercase group-hover:underline">തെറ്റ് (-0.33) 👆</span>
             <span id="wrongCount" class="text-xl sm:text-2xl font-bold text-rose-400 font-mono">0</span>
+            <span class="text-[10px] text-rose-400/60 block">കാണാൻ ക്ലിക്ക് ചെയ്യുക</span>
           </div>
-          <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-600/80">
-            <span class="text-[11px] text-slate-300 block font-semibold uppercase">Skip ചെയ്തവ</span>
+
+          <div id="filterSkippedCard" class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-600/80 hover:bg-slate-700/40 cursor-pointer transition shadow hover:border-slate-400 group" title="സ്കിപ്പ് ചെയ്ത ചോദ്യങ്ങൾ കാണാൻ ക്ലിക്ക് ചെയ്യുക">
+            <span class="text-[11px] text-slate-300 block font-semibold uppercase group-hover:underline">Skip ചെയ്തവ 👆</span>
             <span id="skipCount" class="text-xl sm:text-2xl font-bold text-slate-300 font-mono">0</span>
+            <span class="text-[10px] text-slate-400 block">കാണാൻ ക്ലിക്ക് ചെയ്യുക</span>
           </div>
         </div>
 
         <div id="sheetStatus" class="text-xs text-emerald-400 animate-pulse">സ്കോർ ഗൂഗിൾ ഷീറ്റിലേക്ക് രേഖപ്പെടുത്തുന്നു...</div>
 
+        <!-- 8 Mark Lock Box -->
+        <div id="pdfLockNotice" class="hidden max-w-md mx-auto p-3.5 bg-rose-950/40 border border-rose-800/80 rounded-xl text-xs text-rose-300">
+          ⚠️ <strong>ശ്രദ്ധിക്കുക:</strong> കുറഞ്ഞത് 8 മാർക്ക് നേടിയാൽ മാത്രമേ ഔദ്യോഗിക നോട്ടുകൾ PDF ഡൗൺലോഡ് ചെയ്യാൻ സാധിക്കൂ. നിങ്ങളുടെ നിലവിലെ സ്കോർ 8-ൽ താഴെയാണ്.
+        </div>
+
         <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <button type="button" onclick="returnToHomeWithData()" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-sm transition">
-            🏠 ഹോം പോർട്ടൽ
+          <a id="originalPdfDownloadLink" href="#" target="_blank" class="hidden px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 text-slate-950 font-black rounded-xl text-sm transition shadow-lg flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path></svg>
+            <span>ഔദ്യോഗിക നോട്ടുകൾ PDF ഡൗൺലോഡ് ചെയ്യുക 📥</span>
+          </a>
+
+          <button type="button" id="downloadPdfBtn" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span>സ്കോർകാർഡ് PDF</span>
+          </button>
+
+          <button type="button" onclick="returnToHomeWithData()" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-sm transition flex items-center space-x-1.5">
+            <span>🏠</span>
+            <span>ഹോം പോർട്ടൽ</span>
           </button>
         </div>
       </div>
 
-      <!-- Solutions Area -->
+      <!-- Filtered Question Review Area -->
+      <div id="filterReviewArea" class="hidden bg-slate-800 border-2 border-emerald-500/50 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h3 id="filterReviewTitle" class="text-lg font-bold text-white"></h3>
+          <button type="button" id="closeFilterReviewBtn" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-white font-semibold">ക്ലോസ് ചെയ്യുക ✕</button>
+        </div>
+        <div id="filterReviewList" class="space-y-4 max-h-[60vh] overflow-y-auto custom-scroll pr-1"></div>
+      </div>
+
+      <!-- Permanent Solutions Area at bottom -->
       <div id="pdfExportWrapper" class="bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-2xl">
-        <h3 class="text-xl font-bold text-emerald-400 mb-4 border-b border-slate-700 pb-2">സാമ്പത്തിക ശാസ്ത്രം (സെറ്റ് 2) - ഉത്തര സൂചിക</h3>
+        <div class="border-b border-slate-700 pb-4 mb-6">
+          <h3 class="text-xl font-bold text-emerald-400">സാമ്പത്തിക ശാസ്ത്രം (സെറ്റ് 2) - ഉത്തര സൂചിക</h3>
+          <p class="text-xs text-slate-400 mt-1" id="pdfReportCandidateSubheader">പരീക്ഷാർത്ഥി വിവരങ്ങൾ</p>
+        </div>
         <div id="solutionsContainer" class="space-y-6"></div>
       </div>
     </div>
@@ -165,305 +199,467 @@ window.addEventListener('error', function(e) {
   </main>
 
   <footer class="text-center py-3 text-[11px] text-slate-500 border-t border-slate-800">
-    സാമ്പത്തിക ശാസ്ത്രം (Economics) സെറ്റ് 2 | Special Notes by Subhash Kumar
+    സാമ്പത്തിക ശാസ്ത്രം (Economics) സെറ്റ് 2 | Special Notes by Subhash Kumar[cite: 6]
   </footer>
 
   <script>
-    let GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbztE9bExjlH5a9Y_O8pU9CzVZy5zl-wzycDISurGzxqwuWB71Nxquzpg00Ocf2QR9Zb/exec";
-    const QUIZ_SHEET_NAME = "Economics_Set2";
-    let examTitle = "സാമ്പത്തിക ശാസ്ത്രം - സെറ്റ് 2";
+    let GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbztE9bExjlH5a9Y_O8pU9CzVZy5zl-wzycDISurGzxqwuWB71Nxquzpg00Ocf2QR9Zb/exec";[cite: 6]
+    const QUIZ_SHEET_NAME = "Economics_Set2";[cite: 6]
+    let ORIGINAL_PDF_URL = "https://drive.google.com/file/d/17j7k2FiK0gQcDeQ6O-sSB2WM4iYucSfP/view?usp=sharing";
+    let examTitle = "സാമ്പത്തിക ശാസ്ത്രം - സെറ്റ് 2";[cite: 6]
 
     const questionsData = [
-      { q: "ഇന്ത്യയുടെ കേന്ദ്ര ബാങ്കായ റിസർവ് ബാങ്ക് ഓഫ് ഇന്ത്യ (RBI) സ്ഥാപിതമായ വർഷം ഏത്?", options: ["1935 ഏപ്രിൽ 1", "1949 ജനുവരി 1", "1955 ജൂലൈ 1", "1969 ജൂലൈ 19"], ans: 0, exp: "1935 ഏപ്രിൽ 1-നാണ് ആർ.ബി.ഐ സ്ഥാപിതമായത്." },
-      { q: "ഇന്ത്യയിൽ ആസൂത്രണ കമ്മീഷന് പകരമായി നീതി ആയോഗ് നിലവിൽ വന്ന തീയതി ഏത്?", options: ["2014 ആഗസ്‌റ്റ് 15", "2015 ജനുവരി 1", "2016 ഒക്ടോബർ 2", "2017 ഏപ്രിൽ 1"], ans: 1, exp: "2015 ജനുവരി 1-നാണ് നീതി ആയോഗ് രൂപീകരിച്ചത്." },
-      { q: "പഞ്ചവത്സര പദ്ധതികളെക്കുറിച്ചുള്ള പ്രസ്താവനകളിൽ ശരിയായവ ഏവ?\n1. ഒന്നാം പദ്ധതി കൃഷിക്കാണ് മുൻഗണന നൽകിയത്.\n2. രണ്ടാം പദ്ധതി മഹലനോബിസ് മാതൃകയിലാണ്.\n3. ആകെ 15 പദ്ധതികൾ പൂർത്തിയാക്കി.", options: ["1, 2 ശരിയാണ്", "2, 3 ശരിയാണ്", "1, 3 ശരിയാണ്", "എല്ലാം ശരിയാണ്"], ans: 0, exp: "12 പഞ്ചവത്സര പദ്ധതികൾ മാത്രമാണ് പൂർത്തിയാക്കിയത്." },
-      { q: "നബാർഡ് (NABARD) രൂപീകരിക്കപ്പെട്ട വർഷം ഏത്?", options: ["1975", "1980", "1982", "1991"], ans: 2, exp: "1982 ജൂലൈ 12-നാണ് നബാർഡ് സ്ഥാപിതമായത്." },
-      { q: "റിസർവ് ബാങ്കിന്റെ കാര്യങ്ങളിൽ തെറ്റായ പ്രസ്താവന ഏത്?", options: ["കറൻസി ഇറക്കാനുള്ള കുത്തകാവകാശം ഉണ്ട്", "സർക്കാരിന്റെ ബാങ്കാണ്", "ഒരു രൂപ നോട്ടിൽ ആർ.ബി.ഐ ഗവർണറാണ് ഒപ്പിടുന്നത്", "ബാങ്കുകളുടെ ബാങ്കാണ്"], ans: 2, exp: "ഒരു രൂപ നോട്ടിൽ ധനകാര്യ സെക്രട്ടറിയാണ് ഒപ്പിടുന്നത്." },
-      { q: "നീതി ആയോഗിന്റെ അധ്യക്ഷൻ ആരാണ്?", options: ["രാഷ്ട്രപതി", "ധനകാര്യ മന്ത്രി", "ആർ.ബി.ഐ ഗവർണർ", "പ്രധാനമന്ത്രി"], ans: 3, exp: "പ്രധാനമന്ത്രിയാണ് നീതി ആയോഗിന്റെ അധ്യക്ഷൻ." },
-      { q: "ഒന്നാം പഞ്ചവത്സര പദ്ധതിയുടെ മാതൃക ഏത്?", options: ["ഹാരോഡ്-ഡോമർ", "മഹലനോബിസ്", "ഗാന്ധിയൻ", "വിശ്വേശ്വരയ്യ"], ans: 0, exp: "ഹാരോഡ്-ഡോമർ മോഡലിലാണ് ഒന്നാം പദ്ധതി." },
-      { q: "നീതി ആയോഗിൻറെ ഘടനയെക്കുറിച്ച് ശരിയായതേത്?", options: ["മുഖ്യമന്ത്രിമാർ ഗവേണിംഗ് കൗൺസിലിലുണ്ട്", "തിങ്ക് ടാങ്ക് ആയി പ്രവർത്തിക്കുന്നു", "1, 2 ശരിയാണ്", "പണം നേരിട്ട് വിതരണം ചെയ്യുന്നു"], ans: 2, exp: "1, 2 ശരിയാണ്. നീതി ആയോഗിന് പണം വിതരണം ചെയ്യാൻ അധികാരമില്ല." },
-      { q: "14 പ്രധാന വാണിജ്യ ബാങ്കുകൾ ദേശസാൽക്കരിച്ച വർഷം ഏത്?", options: ["1955", "1969", "1980", "1991"], ans: 1, exp: "1969 ജൂലൈ 19-നാണ് 14 ബാങ്കുകൾ ദേശസാൽക്കരിച്ചത്." },
-      { q: "പഞ്ചവത്സര പദ്ധതികൾക്ക് അന്തിമ അംഗീകാരം നൽകിയിരുന്ന സമിതി ഏത്?", options: ["ദേശീയ വികസന സമിതി (NDC)", "ധനകാര്യ കമ്മീഷൻ", "കേന്ദ്ര മന്ത്രിസഭ", "പാർലമെന്റ്"], ans: 0, exp: "ദേശീയ വികസന സമിതിയാണ് അന്തിമ അംഗീകാരം നൽകിയിരുന്നത്." },
-      { q: "ഇന്ത്യൻ പഞ്ചവത്സര പദ്ധതികളിലെ Plan Holiday കാലഘട്ടം ഏത്?", options: ["1961-1966", "1966-1969", "1978-1980", "1990-1992"], ans: 1, exp: "1966 മുതൽ 1969 വരെയുള്ള 3 വർഷമാണ് പ്ലാൻ ഹോളിഡേ." },
-      { q: "ബാങ്കിംഗ് സംവിധാനങ്ങളിൽ തെറ്റായ പ്രസ്താവന ഏത്?", options: ["ഇംപീരിയൽ ബാങ്കാണ് എസ്.ബി.ഐ ആയത്", "ഗ്രാമീണ വായ്പകൾ നബാർഡ് നോക്കുന്നു", "ആർ.ബി.ഐ ഗവർണറെ ബാങ്കിംഗ് അതോറിറ്റിയാണ് നിയമിക്കുന്നത്", "ആർ.ബി.ഐ കേന്ദ്ര ബാങ്കാണ്"], ans: 2, exp: "ആർ.ബി.ഐ ഗവർണറെ കേന്ദ്ര സർക്കാരാണ് നിയമിക്കുന്നത്." },
-      { q: "'ഗരീബി ഹഠാവോ' എന്ന മുദ്രാവാക്യം മുന്നോട്ടുവെച്ച പഞ്ചവത്സര പദ്ധതി ഏത്?", options: ["മൂന്നാം പദ്ധതി", "നാലാം പദ്ധതി", "അഞ്ചാം പദ്ധതി", "ആറാം പദ്ധതി"], ans: 2, exp: "അഞ്ചാം പഞ്ചവത്സര പദ്ധതിയിലാണ് ഗരീബി ഹഠാവോ വന്നത്." },
-      { q: "ചെറുകിട സംരംഭങ്ങൾക്ക് സാമ്പത്തിക സഹായം നൽകുന്ന സ്ഥാപനം ഏത്?", options: ["സിഡ്ബി (SIDBI)", "നബാർഡ്", "എക്സിം ബാങ്ക്", "സെബി"], ans: 0, exp: "ചെറുകിട വ്യവസായങ്ങൾക്ക് സിഡ്ബിയാണ് വായ്പ നൽകുന്നത്." },
-      { q: "പന്ത്രണ്ടാം പഞ്ചവത്സര പദ്ധതിയെക്കുറിച്ച് ശരിയായത് ഏത്?", options: ["കാലഘട്ടം 2012-2017", "സുസ്ഥിര വളർച്ചയായിരുന്നു ലക്ഷ്യം", "1, 2 ശരിയാണ്", "പതിമൂന്നാം പദ്ധതി ആരംഭിച്ചു"], ans: 2, exp: "1, 2 ശരിയാണ്. പന്ത്രണ്ടാം പദ്ധതിക്ക് ശേഷം പഞ്ചവത്സര പദ്ധതികൾ നിർത്തലാക്കി." },
-      { q: "ഓഹരി വിപണികളെ നിയന്ത്രിക്കുന്ന റെഗുലേറ്ററി അതോറിറ്റി ഏത്?", options: ["ആർ.ബി.ഐ", "ഐ.ആർ.ഡി.എ", "പി.എഫ്.ആർ.ഡി.എ", "സെബി (SEBI)"], ans: 3, exp: "സെബിയാണ് ഓഹരി വിപണികളെ നിയന്ത്രിക്കുന്നത്." },
-      { q: "വിദേശ വ്യാപാരം പ്രോത്സാഹിപ്പിക്കാൻ 1982-ൽ സ്ഥാപിതമായ ബാങ്ക് ഏത്?", options: ["ഐ.ഡി.ബി.ഐ", "എക്സിം ബാങ്ക് (EXIM)", "ഐ.സി.ഐ.സി.ഐ", "എച്ച്.ഡി.എഫ്.സി"], ans: 1, exp: "എക്സ്പോർട്ട്-ഇമ്പോർട്ട് ബാങ്ക് ഓഫ് ഇന്ത്യയാണ് എക്സിം ബാങ്ക്." },
-      { q: "ആസൂത്രണ കമ്മീഷനെക്കുറിച്ച് തെറ്റായ പ്രസ്താവന ഏത്?", options: ["സ്ഥാപിതമായത് 1950-ൽ", "ഒരു ഭരണഘടനാ സ്ഥാപനമായിരുന്നു", "ആദ്യ ചെയർമാൻ നെഹ്റു ആയിരുന്നു", "പഞ്ചവത്സര പദ്ധതികൾ തയ്യാറാക്കി"], ans: 1, exp: "ആസൂത്രണ കമ്മീഷൻ ഒരു ഭരണഘടനാ സ്ഥാപനമായിരുന്നില്ല." },
-      { q: "ഇൻഷുറൻസ് മേഖലയെ നിയന്ത്രിക്കുന്ന സ്ഥാപനം ഏത്?", options: ["സെബി", "നബാർഡ്", "ഐ.ആർ.ഡി.എ.ഐ (IRDAI)", "സിഡ്ബി"], ans: 2, exp: "ഐ.ആർ.ഡി.എ.ഐ ആണ് ഇൻഷുറൻസ് റെഗുലേറ്റർ." },
-      { q: "ധനകാര്യ സ്ഥാപനങ്ങളെക്കുറിച്ച് ശരിയായത് ഏത്?", options: ["രണ്ടാം പദ്ധതിയിൽ ഭിലായ്, റൂർക്കേല തുടങ്ങി", "ആദ്യ RRB 1975-ൽ തുടങ്ങി", "1, 2 ശരിയാണ്", "ആർ.ബി.ഐ 1969-ൽ ദേശീയവൽക്കരിച്ചു"], ans: 2, exp: "1, 2 ശരിയാണ്. ആർ.ബി.ഐ 1949-ലാണ് ദേശസാൽക്കരിച്ചത്." },
-      { q: "ധനനയം രൂപീകരിക്കാൻ ആർ.ബി.ഐക്ക് കീഴിലുള്ള സമിതി ഏത്?", options: ["സ്റ്റിയറിംഗ് കമ്മിറ്റി", "റഗുലേഷൻ സമിതി", "മോണിറ്ററി പോളിസി കമ്മിറ്റി (MPC)", "ക്രെഡിറ്റ് കൗൺസിൽ"], ans: 2, exp: "മോണിറ്ററി പോളിസി കമ്മിറ്റിയാണ് പലിശ നിരക്കുകൾ നിശ്ചയിക്കുന്നത്." },
-      { q: "റോളിംഗ് പ്ലാൻ ഇന്ത്യയിൽ നടപ്പിലാക്കിയ ഭരണകൂടം ഏത്?", options: ["മൊറാർജി ദേശായി സർക്കാർ", "ഇന്ദിരാഗാന്ധി സർക്കാർ", "രാജീവ് ഗാന്ധി", "നരസിംഹറാവു"], ans: 0, exp: "1978-ൽ മൊറാർജി ദേശായി സർക്കാരാണ് റോളിംഗ് പ്ലാൻ കൊണ്ടുവന്നത്." },
-      { q: "ധനകാര്യ സ്ഥാപനങ്ങളുടെ ആസ്ഥാനങ്ങളിൽ തെറ്റായതേത്?", options: ["ആർ.ബി.ഐ - മുംബൈ", "സെബി - കൊൽക്കത്ത", "സിഡ്ബി - ലഖ്നൗ", "എല്ലാം ശരിയാണ്"], ans: 1, exp: "സെബിയുടെ ആസ്ഥാനം മുംബൈയിലാണ്." },
-      { q: "ബാങ്കുകൾ ആർ.ബി.ഐയിൽ സൂക്ഷിക്കേണ്ട പണ അനുപാതം ഏത്?", options: ["റിപ്പോ", "ക്യാഷ് റിസർവ് റേഷ്യോ (CRR)", "ബാങ്ക് നിരക്ക്", "റിവേഴ്സ് റിപ്പോ"], ans: 1, exp: "സി.ആർ.ആർ (Cash Reserve Ratio) ആണ് നിർബന്ധിത പണ അനുപാതം." },
-      { q: "നീതി ആയോഗിന്റെ ആദ്യത്തെ വൈസ് ചെയർപേഴ്സൺ ആരായിരുന്നു?", options: ["രാജീവ് കുമാർ", "സുമൻ ബെറി", "അർവിന്ദ് പനഗാരിയ", "അമർത്യ സെൻ"], ans: 2, exp: "അർവിന്ദ് പനഗാരിയ ആയിരുന്നു ആദ്യ വൈസ് ചെയർമാൻ." }
+      { q: "ഇന്ത്യയുടെ കേന്ദ്ര ബാങ്കായ റിസർവ് ബാങ്ക് ഓഫ് ഇന്ത്യ (RBI) സ്ഥാപിതമായ വർഷം ഏത്?", options: ["1935 ഏപ്രിൽ 1", "1949 ജനുവരി 1", "1955 ജൂലൈ 1", "1969 ജൂലൈ 19"], ans: 0, exp: "1935 ഏപ്രിൽ 1-നാണ് ആർ.ബി.ഐ സ്ഥാപിതമായത്."[cite: 6] },
+      { q: "ഇന്ത്യയിൽ ആസൂത്രണ കമ്മീഷന് പകരമായി നീതി ആയോഗ് നിലവിൽ വന്ന തീയതി ഏത്?", options: ["2014 ആഗസ്‌റ്റ് 15", "2015 ജനുവരി 1", "2016 ഒക്ടോബർ 2", "2017 ഏപ്രിൽ 1"], ans: 1, exp: "2015 ജനുവരി 1-നാണ് നീതി ആയോഗ് രൂപീകരിച്ചത്."[cite: 6] },
+      { q: "പഞ്ചവത്സര പദ്ധതികളെക്കുറിച്ചുള്ള പ്രസ്താവനകളിൽ ശരിയായവ ഏവ?\n1. ഒന്നാം പദ്ധതി കൃഷിക്കാണ് മുൻഗണന നൽകിയത്.\n2. രണ്ടാം പദ്ധതി മഹലനോബിസ് മാതൃകയിലാണ്.\n3. ആകെ 15 പദ്ധതികൾ പൂർത്തിയാക്കി.", options: ["1, 2 ശരിയാണ്", "2, 3 ശരിയാണ്", "1, 3 ശരിയാണ്", "എല്ലാം ശരിയാണ്"], ans: 0, exp: "12 പഞ്ചവത്സര പദ്ധതികൾ മാത്രമാണ് പൂർത്തിയാക്കിയത്."[cite: 6] },
+      { q: "നബാർഡ് (NABARD) രൂപീകരിക്കപ്പെട്ട വർഷം ഏത്?", options: ["1975", "1980", "1982", "1991"], ans: 2, exp: "1982 ജൂലൈ 12-നാണ് നബാർഡ് സ്ഥാപിതമായത്."[cite: 6] },
+      { q: "റിസർവ് ബാങ്കിന്റെ കാര്യങ്ങളിൽ തെറ്റായ പ്രസ്താവന ഏത്?", options: ["കറൻസി ഇറക്കാനുള്ള കുത്തകാവകാശം ഉണ്ട്", "സർക്കാരിന്റെ ബാങ്കാണ്", "ഒരു രൂപ നോട്ടിൽ ആർ.ബി.ഐ ഗവർണറാണ് ഒപ്പിടുന്നത്", "ബാങ്കുകളുടെ ബാങ്കാണ്"], ans: 2, exp: "ഒരു രൂപ നോട്ടിൽ ധനകാര്യ സെക്രട്ടറിയാണ് ഒപ്പിടുന്നത്."[cite: 6] },
+      { q: "നീതി ആയോഗിന്റെ അധ്യക്ഷൻ ആരാണ്?", options: ["രാഷ്ട്രപതി", "ധനകാര്യ മന്ത്രി", "ആർ.ബി.ഐ ഗവർണർ", "പ്രധാനമന്ത്രി"], ans: 3, exp: "പ്രധാനമന്ത്രിയാണ് നീതി ആയോഗിന്റെ അധ്യക്ഷൻ."[cite: 6] },
+      { q: "ഒന്നാം പഞ്ചവത്സര പദ്ധതിയുടെ മാതൃക ഏത്?", options: ["ഹാരോഡ്-ഡോമർ", "മഹലനോബിസ്", "ഗാന്ധിയൻ", "വിശ്വേശ്വരയ്യ"], ans: 0, exp: "ഹാരോഡ്-ഡോമർ മോഡലിലാണ് ഒന്നാം പദ്ധതി."[cite: 6] },
+      { q: "നീതി ആയോഗിൻറെ ഘടനയെക്കുറിച്ച് ശരിയായതേത്?", options: ["മുഖ്യമന്ത്രിമാർ ഗവേണിംഗ് കൗൺസിലിലുണ്ട്", "തിങ്ക് ടാങ്ക് ആയി പ്രവർത്തിക്കുന്നു", "1, 2 ശരിയാണ്", "പണം നേരിട്ട് വിതരണം ചെയ്യുന്നു"], ans: 2, exp: "1, 2 ശരിയാണ്. നീതി ആയോഗിന് പണം വിതരണം ചെയ്യാൻ അധികാരമില്ല."[cite: 6] },
+      { q: "14 പ്രധാന വാണിജ്യ ബാങ്കുകൾ ദേശസാൽക്കരിച്ച വർഷം ഏത്?", options: ["1955", "1969", "1980", "1991"], ans: 1, exp: "1969 ജൂലൈ 19-നാണ് 14 ബാങ്കുകൾ ദേശസാൽക്കരിച്ചത്."[cite: 6] },
+      { q: "പഞ്ചവത്സര പദ്ധതികൾക്ക് അന്തിമ അംഗീകാരം നൽകിയിരുന്ന സമിതി ഏത്?", options: ["ദേശീയ വികസന സമിതി (NDC)", "ധനകാര്യ കമ്മീഷൻ", "കേന്ദ്ര മന്ത്രിസഭ", "പാർലമെന്റ്"], ans: 0, exp: "ദേശീയ വികസന സമിതിയാണ് അന്തിമ അംഗീകാരം നൽകിയിരുന്നത്."[cite: 6] },
+      { q: "ഇന്ത്യൻ പഞ്ചവത്സര പദ്ധതികളിലെ Plan Holiday കാലഘട്ടം ഏത്?", options: ["1961-1966", "1966-1969", "1978-1980", "1990-1992"], ans: 1, exp: "1966 മുതൽ 1969 വരെയുള്ള 3 വർഷമാണ് പ്ലാൻ ഹോളിഡേ."[cite: 6] },
+      { q: "ബാങ്കിംഗ് സംവിധാനങ്ങളിൽ തെറ്റായ പ്രസ്താവന ഏത്?", options: ["ഇംപീരിയൽ ബാങ്കാണ് എസ്.ബി.ഐ ആയത്", "ഗ്രാമീണ വായ്പകൾ നബാർഡ് നോക്കുന്നു", "ആർ.ബി.ഐ ഗവർണറെ ബാങ്കിംഗ് അതോറിറ്റിയാണ് നിയമിക്കുന്നത്", "ആർ.ബി.ഐ കേന്ദ്ര ബാങ്കാണ്"], ans: 2, exp: "ആർ.ബി.ഐ ഗവർണറെ കേന്ദ്ര സർക്കാരാണ് നിയമിക്കുന്നത്."[cite: 6] },
+      { q: "'ഗരീബി ഹഠാവോ' എന്ന മുദ്രാവാക്യം മുന്നോട്ടുവെച്ച പഞ്ചവത്സര പദ്ധതി ഏത്?", options: ["മൂന്നാം പദ്ധതി", "നാലാം പദ്ധതി", "അഞ്ചാം പദ്ധതി", "ആറാം പദ്ധതി"], ans: 2, exp: "അഞ്ചാം പഞ്ചവത്സര പദ്ധതിയിലാണ് ഗരീബി ഹഠാവോ വന്നത്."[cite: 6] },
+      { q: "ചെറുകിട സംരംഭങ്ങൾക്ക് സാമ്പത്തിക സഹായം നൽകുന്ന സ്ഥാപനം ഏത്?", options: ["സിഡ്ബി (SIDBI)", "നബാർഡ്", "എക്സിം ബാങ്ക്", "സെബി"], ans: 0, exp: "ചെറുകിട വ്യവസായങ്ങൾക്ക് സിഡ്ബിയാണ് വായ്പ നൽകുന്നത്."[cite: 6] },
+      { q: "പന്ത്രണ്ടാം പഞ്ചവത്സര പദ്ധതിയെക്കുറിച്ച് ശരിയായത് ഏത്?", options: ["കാലഘട്ടം 2012-2017", "സുസ്ഥിര വളർച്ചയായിരുന്നു ലക്ഷ്യം", "1, 2 ശരിയാണ്", "പതിമൂന്നാം പദ്ധതി ആരംഭിച്ചു"], ans: 2, exp: "1, 2 ശരിയാണ്. പന്ത്രണ്ടാം പദ്ധതിക്ക് ശേഷം പഞ്ചവത്സര പദ്ധതികൾ നിർത്തലാക്കി."[cite: 6] },
+      { q: "ഓഹരി വിപണികളെ നിയന്ത്രിക്കുന്ന റെഗുലേറ്ററി അതോറിറ്റി ഏത്?", options: ["ആർ.ബി.ഐ", "ഐ.ആർ.ഡി.എ", "പി.എഫ്.ആർ.ഡി.എ", "സെബി (SEBI)"], ans: 3, exp: "സെബിയാണ് ഓഹരി വിപണികളെ നിയന്ത്രിക്കുന്നത്."[cite: 6] },
+      { q: "വിദേശ വ്യാപാരം പ്രോത്സാഹിപ്പിക്കാൻ 1982-ൽ സ്ഥാപിതമായ ബാങ്ക് ഏത്?", options: ["ഐ.ഡി.ബി.ഐ", "എക്സിം ബാങ്ക് (EXIM)", "ഐ.സി.ഐ.സി.ഐ", "എച്ച്.ഡി.എഫ്.സി"], ans: 1, exp: "എക്സ്പോർട്ട്-ഇമ്പോർട്ട് ബാങ്ക് ഓഫ് ഇന്ത്യയാണ് എക്സിം ബാങ്ക്."[cite: 6] },
+      { q: "ആസൂത്രണ കമ്മീഷനെക്കുറിച്ച് തെറ്റായ പ്രസ്താവന ഏത്?", options: ["സ്ഥാപിതമായത് 1950-ൽ", "ഒരു ഭരണഘടനാ സ്ഥാപനമായിരുന്നു", "ആദ്യ ചെയർമാൻ നെഹ്റു ആയിരുന്നു", "പഞ്ചവത്സര പദ്ധതികൾ തയ്യാറാക്കി"], ans: 1, exp: "ആസൂത്രണ കമ്മീഷൻ ഒരു ഭരണഘടനാ സ്ഥാപനമായിരുന്നില്ല."[cite: 6] },
+      { q: "ഇൻഷുറൻസ് മേഖലയെ നിയന്ത്രിക്കുന്ന സ്ഥാപനം ഏത്?", options: ["സെബി", "നബാർഡ്", "ഐ.ആർ.ഡി.എ.ഐ (IRDAI)", "സിഡ്ബി"], ans: 2, exp: "ഐ.ആർ.ഡി.എ.ഐ ആണ് ഇൻഷുറൻസ് റെഗുലേറ്റർ."[cite: 6] },
+      { q: "ധനകാര്യ സ്ഥാപനങ്ങളെക്കുറിച്ച് ശരിയായത് ഏത്?", options: ["രണ്ടാം പദ്ധതിയിൽ ഭിലായ്, റൂർക്കേല തുടങ്ങി", "ആദ്യ RRB 1975-ൽ തുടങ്ങി", "1, 2 ശരിയാണ്", "ആർ.ബി.ഐ 1969-ൽ ദേശീയവൽക്കരിച്ചു"], ans: 2, exp: "1, 2 ശരിയാണ്. ആർ.ബി.ഐ 1949-ലാണ് ദേശസാൽക്കരിച്ചത്."[cite: 6] },
+      { q: "ധനനയം രൂപീകരിക്കാൻ ആർ.ബി.ഐക്ക് കീഴിലുള്ള സമിതി ഏത്?", options: ["സ്റ്റിയറിംഗ് കമ്മിറ്റി", "റഗുലേഷൻ സമിതി", "മോണിറ്ററി പോളിസി കമ്മിറ്റി (MPC)", "ക്രെഡിറ്റ് കൗൺസിൽ"], ans: 2, exp: "മോണിറ്ററി പോളിസി കമ്മിറ്റിയാണ് പലിശ നിരക്കുകൾ നിശ്ചയിക്കുന്നത്."[cite: 6] },
+      { q: "റോളിംഗ് പ്ലാൻ ഇന്ത്യയിൽ നടപ്പിലാക്കിയ ഭരണകൂടം ഏത്?", options: ["മൊറാർജി ദേശായി സർക്കാർ", "ഇന്ദിരാഗാന്ധി സർക്കാർ", "രാജീവ് ഗാന്ധി", "നരസിംഹറാവു"], ans: 0, exp: "1978-ൽ മൊറാർജി ദേശായി സർക്കാരാണ് റോളിംഗ് പ്ലാൻ കൊണ്ടുവന്നത്."[cite: 6] },
+      { q: "ധനകാര്യ സ്ഥാപനങ്ങളുടെ ആസ്ഥാനങ്ങളിൽ തെറ്റായതേത്?", options: ["ആർ.ബി.ഐ - മുംബൈ", "സെബി - കൊൽക്കത്ത", "സിഡ്ബി - ലഖ്നൗ", "എല്ലാം ശരിയാണ്"], ans: 1, exp: "സെബിയുടെ ആസ്ഥാനം മുംബൈയിലാണ്."[cite: 6] },
+      { q: "ബാങ്കുകൾ ആർ.ബി.ഐയിൽ സൂക്ഷിക്കേണ്ട പണ അനുപാതം ഏത്?", options: ["റിപ്പോ", "ക്യാഷ് റിസർവ് റേഷ്യോ (CRR)", "ബാങ്ക് നിരക്ക്", "റിവേഴ്സ് റിപ്പോ"], ans: 1, exp: "സി.ആർ.ആർ (Cash Reserve Ratio) ആണ് നിർബന്ധിത പണ അനുപാതം."[cite: 6] },
+      { q: "നീതി ആയോഗിന്റെ ആദ്യത്തെ വൈസ് ചെയർപേഴ്സൺ ആരായിരുന്നു?", options: ["രാജീവ് കുമാർ", "സുമൻ ബെറി", "അർവിന്ദ് പനഗാരിയ", "അമർത്യ സെൻ"], ans: 2, exp: "അർവിന്ദ് പനഗാരിയ ആയിരുന്നു ആദ്യ വൈസ് ചെയർമാൻ."[cite: 6] }
     ];
 
-    let currentUser = { name: "പരീക്ഷാർത്ഥി", phone: "0000000000" };
-    let currentIndex = 0;
-    let userAnswers = new Array(questionsData.length).fill(null);
-    let timeLeft = 25 * 60;
-    let timerInterval = null;
+    let currentUser = { name: "പരീക്ഷാർത്ഥി", phone: "0000000000" };[cite: 6]
+    let currentIndex = 0;[cite: 6]
+    let userAnswers = new Array(questionsData.length).fill(null);[cite: 6]
+    let timeLeft = 25 * 60;[cite: 6]
+    let timerInterval = null;[cite: 6]
 
     window.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const passedName = urlParams.get('name');
-      const passedPhone = urlParams.get('phone');
-      const passedTitle = urlParams.get('title');
-      const passedSheet = urlParams.get('sheetUrl');
+      const passedName = urlParams.get('name');[cite: 6]
+      const passedPhone = urlParams.get('phone');[cite: 6]
+      const passedTitle = urlParams.get('title');[cite: 6]
+      const passedSheet = urlParams.get('sheetUrl');[cite: 6]
+      const passedPdf = urlParams.get('pdfUrl');
 
-      if (passedName) currentUser.name = decodeURIComponent(passedName);
-      if (passedPhone) currentUser.phone = decodeURIComponent(passedPhone);
-      if (passedTitle) examTitle = decodeURIComponent(passedTitle);
-      if (passedSheet) GOOGLE_SHEET_WEBAPP_URL = decodeURIComponent(passedSheet);
+      if (passedName) currentUser.name = decodeURIComponent(passedName);[cite: 6]
+      if (passedPhone) currentUser.phone = decodeURIComponent(passedPhone);[cite: 6]
+      if (passedTitle) examTitle = decodeURIComponent(passedTitle);[cite: 6]
+      if (passedSheet) GOOGLE_SHEET_WEBAPP_URL = decodeURIComponent(passedSheet);[cite: 6]
+      if (passedPdf) ORIGINAL_PDF_URL = decodeURIComponent(passedPdf);
 
-      document.getElementById('displayUser').innerText = `${currentUser.name} (+91 ${currentUser.phone})`;
-      document.getElementById('motivateName').innerText = `ഹലോ, ${currentUser.name}! ✨`;
+      document.getElementById('displayUser').innerText = `${currentUser.name} (+91 ${currentUser.phone})`;[cite: 6]
+      document.getElementById('motivateName').innerText = `ഹലോ, ${currentUser.name}! ✨`;[cite: 6]
     });
 
     function startExamNow() {
-      // Reset exam state so the Start button always opens the first question.
-      if (timerInterval) clearInterval(timerInterval);
-      currentIndex = 0;
-      userAnswers = new Array(questionsData.length).fill(null);
-      timeLeft = 25 * 60;
-      document.getElementById('motivationScreen').classList.add('hidden');
+      document.getElementById('motivationScreen').classList.add('hidden');[cite: 6]
       const qScreen = document.getElementById('quizScreen');
       qScreen.classList.remove('hidden');
       qScreen.classList.add('flex');
-      buildPalette();
-      renderQuestion(0);
-      startTimer();
+      buildPalette();[cite: 6]
+      renderQuestion(0);[cite: 6]
+      startTimer();[cite: 6]
     }
 
     function startTimer() {
-      if (timerInterval) clearInterval(timerInterval);
-      const timerDisplay = document.getElementById('examTimer');
+      const timerDisplay = document.getElementById('examTimer');[cite: 6]
       timerInterval = setInterval(() => {
         if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          alert('സമയം പൂർത്തിയായിരിക്കുന്നു!');
+          clearInterval(timerInterval);[cite: 6]
+          alert('അനുവദിച്ച 25 മിനിറ്റ് സമയം പൂർത്തിയായിരിക്കുന്നു! പരീക്ഷ തനിയെ സബ്മിറ്റ് ചെയ്യുന്നു.');
           finishExam();
           return;
         }
-        timeLeft--;
-        const m = Math.floor(timeLeft / 60);
-        const s = timeLeft % 60;
-        timerDisplay.innerText = `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
-      }, 1000);
+        timeLeft--;[cite: 6]
+        const m = Math.floor(timeLeft / 60);[cite: 6]
+        const s = timeLeft % 60;[cite: 6]
+        timerDisplay.innerText = `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;[cite: 6]
+
+        if (timeLeft <= 180) {
+          timerDisplay.classList.remove('text-emerald-400');
+          timerDisplay.classList.add('text-rose-500', 'animate-pulse');
+        }
+      }, 1000);[cite: 6]
     }
 
     function renderQuestion(index) {
-      const q = questionsData[index];
-      currentIndex = index;
-      document.getElementById('questionBadge').innerText = `ചോദ്യം ${index + 1} / ${questionsData.length}`;
-      document.getElementById('qText').innerText = `${index + 1}. ${q.q}`;
-      document.getElementById('answeredCountTxt').innerText = `പൂർത്തിയാക്കിയത്: ${userAnswers.filter(a => a !== null).length}/${questionsData.length}`;
+      const q = questionsData[index];[cite: 6]
+      currentIndex = index;[cite: 6]
+      document.getElementById('questionBadge').innerText = `ചോദ്യം ${index + 1} / ${questionsData.length}`;[cite: 6]
+      document.getElementById('qText').innerText = `${index + 1}. ${q.q}`;[cite: 6]
+      document.getElementById('answeredCountTxt').innerText = `പൂർത്തിയാക്കിയത്: ${userAnswers.filter(a => a !== null).length}/${questionsData.length}`;[cite: 6]
 
-      const optionsDiv = document.getElementById('optionsContainer');
-      optionsDiv.innerHTML = '';
-      const letters = ['A', 'B', 'C', 'D'];
+      const optionsDiv = document.getElementById('optionsContainer');[cite: 6]
+      optionsDiv.innerHTML = '';[cite: 6]
+      const letters = ['A', 'B', 'C', 'D'];[cite: 6]
 
       q.options.forEach((opt, idx) => {
-        const isSelected = userAnswers[index] === idx;
-        const btn = document.createElement('button');
-        btn.type = 'button';
+        const isSelected = userAnswers[index] === idx;[cite: 6]
+        const btn = document.createElement('button');[cite: 6]
+        btn.type = 'button';[cite: 6]
         btn.className = `w-full text-left p-3.5 rounded-xl border transition flex items-start space-x-3 ${
           isSelected ? 'bg-emerald-500/20 border-emerald-500 text-emerald-200' : 'bg-slate-900/60 border-slate-700 text-slate-200'
-        }`;
-        btn.innerHTML = `<span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${isSelected ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800'}">${letters[idx]}</span><span class="text-xs sm:text-sm mt-0.5">${opt}</span>`;
+        }`;[cite: 6]
+        btn.innerHTML = `<span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${isSelected ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800'}">${letters[idx]}</span><span class="text-xs sm:text-sm mt-0.5">${opt}</span>`;[cite: 6]
         btn.onclick = () => {
-          userAnswers[index] = idx;
-          renderQuestion(index);
+          userAnswers[index] = idx;[cite: 6]
+          renderQuestion(index);[cite: 6]
         };
-        optionsDiv.appendChild(btn);
+        optionsDiv.appendChild(btn);[cite: 6]
       });
 
-      document.getElementById('prevBtn').disabled = (index === 0);
-      document.getElementById('nextBtn').innerText = (index === questionsData.length - 1) ? "സബ്മിറ്റ് ചെയ്യുക ✓" : "Next ›";
-      updatePalette();
+      document.getElementById('prevBtn').disabled = (index === 0);[cite: 6]
+      document.getElementById('nextBtn').innerText = (index === questionsData.length - 1) ? "സബ്മിറ്റ് ചെയ്യുക ✓" : "Next ›";[cite: 6]
+      updatePalette();[cite: 6]
     }
 
     function buildPalette() {
-      const pal = document.getElementById('paletteContainer');
-      pal.innerHTML = '';
+      const pal = document.getElementById('paletteContainer');[cite: 6]
+      pal.innerHTML = '';[cite: 6]
       for (let i = 0; i < questionsData.length; i++) {
-        const b = document.createElement('button');
-        b.id = `pal-${i}`;
-        b.innerText = i + 1;
-        b.className = 'w-7 h-7 rounded text-[11px] font-bold flex items-center justify-center border transition';
-        b.onclick = () => { currentIndex = i; renderQuestion(currentIndex); };
-        pal.appendChild(b);
+        const b = document.createElement('button');[cite: 6]
+        b.id = `pal-${i}`;[cite: 6]
+        b.innerText = i + 1;[cite: 6]
+        b.className = 'w-7 h-7 rounded text-[11px] font-bold flex items-center justify-center border transition';[cite: 6]
+        b.onclick = () => { currentIndex = i; renderQuestion(currentIndex); };[cite: 6]
+        pal.appendChild(b);[cite: 6]
       }
-      updatePalette();
+      updatePalette();[cite: 6]
     }
 
     function updatePalette() {
       for (let i = 0; i < questionsData.length; i++) {
-        const b = document.getElementById(`pal-${i}`);
-        if (!b) continue;
+        const b = document.getElementById(`pal-${i}`);[cite: 6]
+        if (!b) continue;[cite: 6]
         if (i === currentIndex) {
-          b.className = 'w-7 h-7 rounded text-[11px] font-black border border-emerald-400 bg-emerald-400 text-slate-950';
+          b.className = 'w-7 h-7 rounded text-[11px] font-black border border-emerald-400 bg-emerald-400 text-slate-950';[cite: 6]
         } else if (userAnswers[i] !== null) {
-          b.className = 'w-7 h-7 rounded text-[11px] font-semibold border border-emerald-500/50 bg-emerald-950/60 text-emerald-400';
+          b.className = 'w-7 h-7 rounded text-[11px] font-semibold border border-emerald-500/50 bg-emerald-950/60 text-emerald-400';[cite: 6]
         } else {
-          b.className = 'w-7 h-7 rounded text-[11px] font-medium border border-slate-700 bg-slate-900 text-slate-400';
+          b.className = 'w-7 h-7 rounded text-[11px] font-medium border border-slate-700 bg-slate-900 text-slate-400';[cite: 6]
         }
       }
     }
 
     function nextQuestion() {
       if (currentIndex < questionsData.length - 1) {
-        currentIndex++;
-        renderQuestion(currentIndex);
+        currentIndex++;[cite: 6]
+        renderQuestion(currentIndex);[cite: 6]
       } else {
-        finishExam();
+        finishExam();[cite: 6]
       }
     }
 
     function prevQuestion() {
       if (currentIndex > 0) {
-        currentIndex--;
-        renderQuestion(currentIndex);
+        currentIndex--;[cite: 6]
+        renderQuestion(currentIndex);[cite: 6]
       }
     }
 
     function skipQuestion() {
-      userAnswers[currentIndex] = null;
-      nextQuestion();
+      userAnswers[currentIndex] = null;[cite: 6]
+      nextQuestion();[cite: 6]
+    }
+
+    function finishExamPrompt() {
+      const answered = userAnswers.filter(a => a !== null).length;
+      if (confirm(`നിങ്ങൾ 25-ൽ ${answered} ചോദ്യങ്ങൾക്ക് മാത്രമാണ് ഉത്തരം നൽകിയത്. ഇപ്പോൾ പരീക്ഷ അവസാനിപ്പിക്കണമെന്നുറപ്പാണോ?`)) {
+        finishExam();
+      }
     }
 
     function finishExam() {
-      if (timerInterval) clearInterval(timerInterval);
+      if (timerInterval) clearInterval(timerInterval);[cite: 6]
 
-      let correct = 0, wrong = 0, skipped = 0;
+      let correct = 0, wrong = 0, skipped = 0;[cite: 6]
       for (let i = 0; i < questionsData.length; i++) {
-        if (userAnswers[i] === null) skipped++;
-        else if (userAnswers[i] === questionsData[i].ans) correct++;
-        else wrong++;
+        if (userAnswers[i] === null) skipped++;[cite: 6]
+        else if (userAnswers[i] === questionsData[i].ans) correct++;[cite: 6]
+        else wrong++;[cite: 6]
       }
 
-      let netScore = (correct * 1.0) - (wrong * 0.33);
-      if (netScore < 0) netScore = 0;
-      const formattedScore = netScore.toFixed(2);
+      let netScore = (correct * 1.0) - (wrong * 0.33333333);
+      if (netScore < 0) netScore = 0;[cite: 6]
+      const formattedScore = netScore.toFixed(2);[cite: 6]
+      const scoreNum = parseFloat(formattedScore);
 
-      document.getElementById('finalScore').innerText = formattedScore;
-      document.getElementById('correctCount').innerText = correct;
-      document.getElementById('wrongCount').innerText = wrong;
-      document.getElementById('skipCount').innerText = skipped;
-      document.getElementById('resultCandidateInfo').innerText = `പരീക്ഷാർത്ഥി: ${currentUser.name} (${currentUser.phone})`;
+      document.getElementById('finalScore').innerText = formattedScore;[cite: 6]
+      document.getElementById('correctCount').innerText = correct;[cite: 6]
+      document.getElementById('wrongCount').innerText = wrong;[cite: 6]
+      document.getElementById('skipCount').innerText = skipped;[cite: 6]
+      document.getElementById('resultCandidateInfo').innerText = `പരീക്ഷാർത്ഥി: ${currentUser.name} | മൊബൈൽ: ${currentUser.phone}`;
+      document.getElementById('pdfReportCandidateSubheader').innerText = `പരീക്ഷാർത്ഥി: ${currentUser.name} (${currentUser.phone}) | സ്കോർ: ${formattedScore} / 25 | ശരി: ${correct} | തെറ്റ്: ${wrong} | Skip: ${skipped}`;
+
+      const badge = document.getElementById('scoreMotivationBadge');
+      if (scoreNum >= 20) {
+        badge.className = "max-w-xl mx-auto p-4 rounded-2xl border border-emerald-500/60 bg-emerald-950/40 text-emerald-300";
+        badge.innerHTML = `🏆 <strong>ഗംഭീര വിജയം!</strong> പഞ്ചവത്സര പദ്ധതികളിലും ധനകാര്യ സ്ഥാപനങ്ങളിലും നിങ്ങൾ മികച്ച അറിവ് നേടിയിരിക്കുന്നു. ഈ മികവ് നിലനിർത്തുക!`;
+      } else if (scoreNum >= 14) {
+        badge.className = "max-w-xl mx-auto p-4 rounded-2xl border border-emerald-500/60 bg-emerald-950/40 text-emerald-300";
+        badge.innerHTML = `👏 <strong>മികച്ച മുന്നേറ്റം!</strong> ലക്ഷ്യത്തിലേക്ക് നിങ്ങൾ വളരെ അടുത്താണ്. തെറ്റിയ ചോദ്യങ്ങളുടെ വിശദീകരണം കണ്ട് സംശയങ്ങൾ പരിഹരിക്കുക.`;
+      } else if (scoreNum >= 8) {
+        badge.className = "max-w-xl mx-auto p-4 rounded-2xl border border-amber-500/60 bg-amber-950/40 text-amber-300";
+        badge.innerHTML = `💡 <strong>നല്ല ശ്രമം!</strong> ചില പ്രധാന ഭാഗങ്ങൾ കൂടി ശ്രദ്ധയോടെ റിവിഷൻ ചെയ്താൽ മികച്ച സ്കോറിലേക്ക് എത്താം. ആവർത്തിച്ചു പരിശീലിക്കുക!`;
+      } else {
+        badge.className = "max-w-xl mx-auto p-4 rounded-2xl border border-rose-500/60 bg-rose-950/40 text-rose-300";
+        badge.innerHTML = `🌱 <strong>പരിശ്രമം തുടരുക!</strong> പരാജയങ്ങൾ വിജയത്തിലേക്കുള്ള വഴികാട്ടിയാണ്. നോട്ടുകൾ വീണ്ടും വായിച്ചുപഠിച്ച് അടുത്ത തവണ കൂടുതൽ കരുത്തോടെ മുന്നേറുക!`;
+      }
 
       try {
         if (currentUser && currentUser.phone && currentUser.phone !== "0000000000") {
-          const historyKey = `sk_history_${currentUser.phone}`;
-          let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+          const historyKey = `sk_history_${currentUser.phone}`;[cite: 6]
+          let history = JSON.parse(localStorage.getItem(historyKey) || '[]');[cite: 6]
           history.push({
-            title: examTitle,
-            score: formattedScore,
-            correct: correct,
-            wrong: wrong,
-            skipped: skipped,
-            date: new Date().toLocaleDateString('ml-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+            title: examTitle,[cite: 6]
+            score: formattedScore,[cite: 6]
+            correct: correct,[cite: 6]
+            wrong: wrong,[cite: 6]
+            skipped: skipped,[cite: 6]
+            date: new Date().toLocaleDateString('ml-IN', { day: 'numeric', month: 'short', year: 'numeric' })[cite: 6]
           });
-          localStorage.setItem(historyKey, JSON.stringify(history));
+          localStorage.setItem(historyKey, JSON.stringify(history));[cite: 6]
         }
       } catch (err) {}
 
-      renderSolutions();
+      const downloadBtn = document.getElementById('originalPdfDownloadLink');
+      const lockNotice = document.getElementById('pdfLockNotice');
 
-      document.getElementById('quizScreen').classList.add('hidden');
-      document.getElementById('quizScreen').classList.remove('flex');
-      document.getElementById('resultScreen').classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (scoreNum >= 8.0 && ORIGINAL_PDF_URL) {
+        downloadBtn.href = ORIGINAL_PDF_URL;
+        downloadBtn.classList.remove('hidden');
+        lockNotice.classList.add('hidden');
+      } else {
+        downloadBtn.classList.add('hidden');
+        if (ORIGINAL_PDF_URL) lockNotice.classList.remove('hidden');
+      }
+
+      renderSolutions();[cite: 6]
+      setupClickableReviewCards();
+
+      document.getElementById('quizScreen').classList.add('hidden');[cite: 6]
+      document.getElementById('quizScreen').classList.remove('flex');[cite: 6]
+      document.getElementById('resultScreen').classList.remove('hidden');[cite: 6]
+      window.scrollTo({ top: 0, behavior: 'smooth' });[cite: 6]
 
       sendResultToGoogleSheet({
-        name: currentUser.name,
-        phone: currentUser.phone,
-        score: formattedScore,
-        correct: correct,
-        wrong: wrong,
-        skipped: skipped
+        name: currentUser.name,[cite: 6]
+        phone: currentUser.phone,[cite: 6]
+        score: formattedScore,[cite: 6]
+        correct: correct,[cite: 6]
+        wrong: wrong,[cite: 6]
+        skipped: skipped[cite: 6]
       });
     }
 
-    function renderSolutions() {
-      const cont = document.getElementById('solutionsContainer');
-      cont.innerHTML = '';
+    function setupClickableReviewCards() {
+      document.getElementById('filterCorrectCard').onclick = () => renderFilteredQuestions('correct');
+      document.getElementById('filterWrongCard').onclick = () => renderFilteredQuestions('wrong');
+      document.getElementById('filterSkippedCard').onclick = () => renderFilteredQuestions('skipped');
+    }
+
+    function renderFilteredQuestions(type) {
+      const area = document.getElementById('filterReviewArea');
+      const title = document.getElementById('filterReviewTitle');
+      const list = document.getElementById('filterReviewList');
       const letters = ['A', 'B', 'C', 'D'];
 
+      list.innerHTML = '';
+      area.classList.remove('hidden');
+
+      if (type === 'correct') {
+        title.innerHTML = `✅ നിങ്ങൾ ശരിയാക്കിയ ചോദ്യങ്ങൾ (Correct Answers)`;
+        title.className = "text-lg font-bold text-emerald-400";
+      } else if (type === 'wrong') {
+        title.innerHTML = `❌ നിങ്ങൾക്ക് തെറ്റിയ ചോദ്യങ്ങൾ (Wrong Answers)`;
+        title.className = "text-lg font-bold text-rose-400";
+      } else {
+        title.innerHTML = `⏭️ നിങ്ങൾ ഒഴിവാക്കിയ ചോദ്യങ്ങൾ (Skipped Questions)`;
+        title.className = "text-lg font-bold text-slate-300";
+      }
+
+      let count = 0;
       questionsData.forEach((q, idx) => {
         const uAns = userAnswers[idx];
         const isCorrect = uAns === q.ans;
+        const isWrong = uAns !== null && !isCorrect;
         const isSkipped = uAns === null;
 
-        let badge = isSkipped 
-          ? '<span class="px-2 py-0.5 rounded text-xs bg-slate-700 text-slate-300">Skipped</span>' 
-          : isCorrect 
-          ? '<span class="px-2 py-0.5 rounded text-xs bg-emerald-950 text-emerald-400 font-bold">+1.00 Mark</span>' 
-          : '<span class="px-2 py-0.5 rounded text-xs bg-rose-950 text-rose-400 font-bold">-0.33 Mark</span>';
+        if ((type === 'correct' && isCorrect) || (type === 'wrong' && isWrong) || (type === 'skipped' && isSkipped)) {
+          count++;
+          const card = document.createElement('div');
+          card.className = "p-4 rounded-xl border border-slate-700 bg-slate-900/90 space-y-2 text-xs sm:text-sm";
+          
+          let optsMarkup = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">';
+          q.options.forEach((opt, oIdx) => {
+            let optClass = 'p-2 rounded-lg border flex items-center space-x-2 text-xs ';
+            if (oIdx === q.ans) {
+              optClass += 'border-emerald-500 bg-emerald-950/40 text-emerald-300 font-semibold';
+            } else if (oIdx === uAns && !isCorrect) {
+              optClass += 'border-rose-500 bg-rose-950/40 text-rose-300 line-through';
+            } else {
+              optClass += 'border-slate-800 text-slate-400';
+            }
+            optsMarkup += `<div class="${optClass}"><span>${letters[oIdx]})</span><span>${opt}</span></div>`;
+          });
+          optsMarkup += '</div>';
 
-        let item = document.createElement('div');
-        item.className = 'p-4 rounded-xl border border-slate-700 bg-slate-900/70 space-y-2';
+          let statusBadge = isCorrect 
+            ? '<span class="text-emerald-400 font-bold">+1.00 Mark</span>' 
+            : isWrong 
+            ? '<span class="text-rose-400 font-bold">-0.33 Mark</span>' 
+            : '<span class="text-slate-400 font-bold">Skipped (0 Mark)</span>';
+
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-emerald-400">ചോദ്യം ${idx + 1}</span>
+              <div>${statusBadge}</div>
+            </div>
+            <p class="text-slate-200 font-medium">${q.q}</p>
+            ${optsMarkup}
+            <div class="bg-slate-800 p-2.5 rounded-lg border border-slate-700 mt-2 text-xs leading-relaxed">
+              <span class="font-bold text-emerald-400">വിശദീകരണം:</span>
+              <span class="text-slate-300 ml-1">${q.exp}</span>
+            </div>
+          `;
+          list.appendChild(card);
+        }
+      });
+
+      if (count === 0) {
+        list.innerHTML = `<p class="py-4 text-center text-slate-400 text-xs">ഈ വിഭാഗത്തിൽ ചോദ്യങ്ങൾ ഒന്നുമില്ല.</p>`;
+      }
+
+      area.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.getElementById('closeFilterReviewBtn').onclick = () => {
+      document.getElementById('filterReviewArea').classList.add('hidden');
+    };
+
+    function renderSolutions() {
+      const cont = document.getElementById('solutionsContainer');[cite: 6]
+      cont.innerHTML = '';[cite: 6]
+      const letters = ['A', 'B', 'C', 'D'];[cite: 6]
+
+      questionsData.forEach((q, idx) => {
+        const uAns = userAnswers[idx];[cite: 6]
+        const isCorrect = uAns === q.ans;[cite: 6]
+        const isSkipped = uAns === null;[cite: 6]
+
+        let badge = isSkipped 
+          ? '<span class="px-2 py-0.5 rounded text-xs bg-slate-700 text-slate-300">Skipped (മാർക്ക് മാറ്റമില്ല)</span>' 
+          : isCorrect 
+          ? '<span class="px-2 py-0.5 rounded text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold">+1.00 Mark (ശരിയുത്തരം)</span>' 
+          : '<span class="px-2 py-0.5 rounded text-xs bg-rose-950 text-rose-400 border border-rose-800 font-bold">-0.33 Mark (തെറ്റ്)</span>';
+
+        let optsHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">';
+        q.options.forEach((opt, oIdx) => {
+          let c = 'p-2.5 rounded-lg text-xs flex items-center space-x-2 border ';
+          if (oIdx === q.ans) c += 'border-emerald-500 bg-emerald-950/40 text-emerald-300 font-semibold';
+          else if (oIdx === uAns && !isCorrect) c += 'border-rose-500 bg-rose-950/40 text-rose-300 line-through';
+          else c += 'border-slate-800 text-slate-400';
+
+          optsHtml += `
+            <div class="${c}">
+              <span class="font-bold">${letters[oIdx]})</span>
+              <span>${opt}</span>
+              ${oIdx === q.ans ? '<span class="ml-auto text-emerald-400 font-bold">✓ ശരി</span>' : ''}
+              ${oIdx === uAns && !isCorrect ? '<span class="ml-auto text-rose-400 font-bold">✗ നിങ്ങൾ തിരഞ്ഞെടുത്തത്</span>' : ''}
+            </div>
+          `;
+        });
+        optsHtml += '</div>';
+
+        const item = document.createElement('div');[cite: 6]
+        item.className = 'p-4 rounded-xl border border-slate-700 bg-slate-900/70 space-y-2';[cite: 6]
         item.innerHTML = `
           <div class="flex justify-between items-start gap-2">
             <span class="font-bold text-emerald-400 text-sm">ചോദ്യം ${idx + 1}</span>
             <div>${badge}</div>
           </div>
-          <p class="text-sm font-medium text-slate-200">${q.q}</p>
-          <div class="bg-slate-800 p-2.5 rounded-lg border border-slate-700 text-xs">
-            <span class="font-bold text-emerald-400">ശരിയുത്തരം:</span> ${letters[q.ans]}) ${q.options[q.ans]}<br>
-            <span class="font-bold text-slate-400">വിശദീകരണം:</span> ${q.exp}
+          <p class="text-sm font-medium text-slate-200 whitespace-pre-line">${q.q}</p>
+          ${optsHtml}
+          <div class="bg-slate-800/90 p-3 rounded-lg border border-slate-700 mt-2 text-xs leading-relaxed">
+            <span class="font-bold text-emerald-400">വിശദീകരണം:</span>
+            <span class="text-slate-300 ml-1">${q.exp}</span>
           </div>
         `;
-        cont.appendChild(item);
+        cont.appendChild(item);[cite: 6]
       });
     }
 
+    document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+      const element = document.getElementById('pdfExportWrapper');
+      const opt = {
+        margin:       [10, 10, 10, 10],
+        filename:     `${currentUser.name}_Economics_Set2_Scorecard.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#1e293b' },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      const btn = document.getElementById('downloadPdfBtn');
+      btn.innerText = 'PDF തയ്യാറാക്കുന്നു...';
+      btn.disabled = true;
+
+      html2pdf().set(opt).from(element).save().then(() => {
+        btn.innerHTML = `
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          <span>PDF ഡൗൺലോഡ് ആയി!</span>
+        `;
+        setTimeout(() => {
+          btn.innerHTML = `
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span>സ്കോർകാർഡ് PDF</span>
+          `;
+          btn.disabled = false;
+        }, 3000);
+      });
+    });
+
     function sendResultToGoogleSheet(payload) {
-      payload.sheetName = QUIZ_SHEET_NAME;
-      if (!GOOGLE_SHEET_WEBAPP_URL) return;
+      payload.sheetName = QUIZ_SHEET_NAME;[cite: 6]
+      const statusDiv = document.getElementById('sheetStatus');[cite: 6]
+      if (!GOOGLE_SHEET_WEBAPP_URL || GOOGLE_SHEET_WEBAPP_URL.includes("YOUR_APPS_SCRIPT_WEBAPP_URL_HERE")) {[cite: 6]
+        statusDiv.innerText = "Google Sheet ലിങ്ക് നൽകിയിട്ടില്ല (മാർക്ക് മുകളിൽ ലഭ്യമാണ്).";
+        statusDiv.classList.remove('animate-pulse');
+        return;
+      }
 
       fetch(GOOGLE_SHEET_WEBAPP_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        method: 'POST',[cite: 6]
+        mode: 'no-cors',[cite: 6]
+        headers: { 'Content-Type': 'application/json' },[cite: 6]
+        body: JSON.stringify(payload)[cite: 6]
       })
       .then(() => {
-        document.getElementById('sheetStatus').innerText = "✓ മാർക്ക് ഗൂഗിൾ ഷീറ്റിലേക്ക് രേഖപ്പെടുത്തി!";
+        statusDiv.innerText = `✓ മാർക്ക് '${QUIZ_SHEET_NAME}' എന്ന ഷീറ്റ് ടാബിലേക്ക് രേഖപ്പെടുത്തി!`;
+        statusDiv.className = "text-xs text-emerald-400 mb-4";
       })
       .catch(() => {
-        document.getElementById('sheetStatus').innerText = "ഡാറ്റ സേവ് ചെയ്യുന്നതിൽ ചെറിയ തടസ്സം നേരിട്ടു.";
+        statusDiv.innerText = "ഡാറ്റ സേവ് ചെയ്യുന്നതിൽ ചെറിയ തടസ്സം നേരിട്ടു.";[cite: 6]
+        statusDiv.className = "text-xs text-rose-400 mb-4";
       });
     }
 
     function returnToHomeWithData() {
+      const homePortalUrl = "https://subhash-kumar00.github.io/PSC-EXAMS/";
       const score = document.getElementById('finalScore').innerText;
       const correct = document.getElementById('correctCount').innerText;
       const wrong = document.getElementById('wrongCount').innerText;
       const skipped = document.getElementById('skipCount').innerText;
 
-      try {
-        const historyKey = `sk_history_${currentUser.phone}`;
-        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
-        history.push({
-          title: examTitle,
-          score,
-          correct,
-          wrong,
-          skipped,
-          date: new Date().toLocaleDateString('ml-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-        });
-        localStorage.setItem(historyKey, JSON.stringify(history));
-      } catch (e) {}
-
-      document.getElementById('resultScreen').classList.add('hidden');
-      document.getElementById('motivationScreen').classList.remove('hidden');
-      document.getElementById('quizScreen').classList.add('hidden');
-      document.getElementById('quizScreen').classList.remove('flex');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.location.href = `${homePortalUrl}?completed=true&title=${encodeURIComponent(examTitle)}&score=${score}&correct=${correct}&wrong=${wrong}&skipped=${skipped}`;
     }
   </script>
 </body>
